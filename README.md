@@ -6,13 +6,10 @@ This project analyzes how political affiliation influences attitudes toward high
 - Approval of college and university governance
 - Sentiment toward university professors (via a 0–100 feelings thermometer)
 
-The dataset was reduced from 1,910 to 1,460 respondents after filtering out individuals without a clear political affiliation.
-
 ## Files
-
-- `degrees-of-division.Rmd`: R Markdown analysis script
-- `degrees-of-division.pdf`: Final rendered report
-- `/figures`: Folder containing exported plots
+- `anes_pilot_2024_20240319.csv`: Raw ANES survey data used for the analysis
+- `degrees-of-division.Rmd`: R Markdown script for data cleaning, analysis, and visualization
+- `degrees-of-division.pdf`: Final rendered report summarizing the findings
 
 ## Tools
 

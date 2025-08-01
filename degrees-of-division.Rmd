@@ -1,0 +1,201 @@
+---
+title: "Degrees of Division"
+subtitle: "How Democrats and Republicans View Higher Education"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(stats)
+library(tidyverse)
+library(rmarkdown)
+
+```
+
+## Introduction
+
+This analysis uses visualizations to explore survey responses from Democratic and Republican voters. It focuses on differences in educational attainment, attitudes toward college professors, and approval of higher education between the two groups. These visual comparisons aim to reveal how partisan views diverge on issues related to secondary education, with potential implications for perspectives on primary education as well.
+
+
+
+## Data
+
+The data used in this analysis was retrieved from the [American National Election Studies (ANES)](https://electionstudies.org).The original dataset contained 1,910 survey responses. To focus the analysis on political partisanship, entries that did not include a clear political affiliation (e.g., independent, unsure, or skipped responses) were excluded. After this filtering step, the final dataset consisted of 1,460 respondents who identified as either Democratic or Republican voters.
+
+The dataset includes variables on:
+
+* Political affiliation
+* Approval of how colleges and universities are run
+* Feelings toward college professors (measured on a 0–100 "feelings thermometer")
+* Highest level of education attained
+
+This refined dataset forms the basis for all visual analyses presented in the report.
+
+
+```{r data, include=FALSE}
+
+## Data Wrangling
+
+data = read.csv("anes_pilot_2024_20240319.csv") %>%
+  .[c("pid_dstr", "pid_rstr", "pid_partylean", "educ", "highered_approve", "group_colprofs")] %>% 
+  mutate(therm_colprofs = as.numeric(case_when((nchar(group_colprofs)<=3)==TRUE ~ group_colprofs))) %>% #filter out non-numeric values
+  mutate(higher_ed_approve = case_when(highered_approve == "Neither approve nor disapprove" ~ "Neither",
+                                       highered_approve != "inapplicable, legitimate skip" ~ highered_approve)) %>%
+  mutate(Party = case_when(
+    pid_dstr=="Strong" | pid_dstr=="Not very strong" | pid_partylean == "Closer to the Democratic Party" ~ "Democratic",
+    pid_rstr=="Strong" | pid_rstr=="Not very strong" | pid_partylean == "Closer to the Republican Party" ~ "Republican")) %>%
+  mutate(educ = replace(educ, educ == 'High school graduate', "HS graduate")) %>%
+  filter(!is.na(Party)) %>%
+  select(Party, educ, higher_ed_approve, therm_colprofs)
+
+```
+
+
+## Graphs
+
+
+### Education Level by Political Party
+
+The first graph, titled "Education Level by Political Party", compares the educational attainment of Democratic and Republican voters. It reveals that Democrats generally have higher levels of education, with more individuals completing four-year and postgraduate degrees. In contrast, Republicans are more concentrated in the high school graduate category, highlighting a noticeable divide in educational achievement between the two parties.
+
+\vspace{2em}
+
+```{r plot 1, echo=FALSE, fig.height=3, fig.width=8.5}
+
+data %>% 
+  ggplot(aes(x=factor(educ, level = 
+                            c("No HS credential", "HS graduate", "Some college", 
+                              "2-year degree",  "4-year degree",  "Post-grad")), fill=Party))+
+  # facet_wrap(vars(party)) +
+  geom_bar(position="dodge") +
+  scale_fill_manual(values=c("#00BFC4","#F8766D")) +
+  geom_bar(position="dodge") +
+  scale_x_discrete(labels = label_wrap(10)) +
+  labs(title="Education Level by Political Party", x="", fill="Political Party") +
+  theme_bw()
+
+```
+
+
+
+
+### Approval of How Colleges and Universities Are Run
+
+The second graph, "Approval of How Colleges and Universities Are Run", shows a partisan split in views regarding the management of colleges and universities. Data on Republican voters skew to the left, with many expressing strong disapproval and skepticism. Democrats are more neutral to favorable as shown from the normal distribution.
+
+\vspace{2em}
+
+```{r plot 2, echo=FALSE, fig.height=3, fig.width=8.5}
+
+data %>% 
+  filter(!is.na(higher_ed_approve)) %>%
+  ggplot(aes(x=factor(higher_ed_approve, level = 
+                        c("Disapprove strongly", "Disapprove somewhat",  "Neither", 
+                          "Approve somewhat", "Approve strongly")), fill = Party))+
+  # facet_wrap(vars(party)) +
+  geom_bar(position="dodge") +
+  scale_fill_manual(values=c("#00BFC4","#F8766D")) +
+  scale_x_discrete(labels = label_wrap(10)) +
+  labs(title="Approval of How Colleges and Universities Are Run", x="", fill="Political Party")+
+  theme_bw()  
+```
+
+
+
+
+### Feelings Thermometer Toward University and College Professors
+
+The third graph, titled "Feelings Thermometer Toward University and College Professors", demonstrates a similar partisan division in how voters feel about professors. A feelings thermometer is a scale from 0 to 100 that measures how warmly or coldly a respondent feels toward a person or group, with higher values indicating more favorable attitudes. Democrats express overwhelmingly positive feelings, while Republicans show a broader range of responses, often leaning toward negative perceptions of professors.
+
+\vspace{2em}
+
+```{r plot 3, echo=FALSE, fig.height=3, fig.width=8.5}
+
+data %>%
+  ggplot(aes(therm_colprofs, fill=Party)) +
+  # facet_wrap(vars(party)) +
+  geom_histogram(bins=20, position="dodge") +
+  scale_fill_manual(values=c("#00BFC4","#F8766D")) +
+  labs(title="Feelings Thermometer - University and College Professors", x="Thermometer", y="Count", fill="Political Party") +
+  theme_bw() 
+```
+
+
+
+### Sentiments Toward Professors Based on Approval of Higher Education 
+
+The boxplot, titled "Sentiments Towards University and College Professors Based On Approval of How University and Colleges Are Run", compares how Democratic and Republican voters feel about college professors depending on their level of approval for how colleges and universities are run.
+
+Notably, the graph includes a color gradient within each box, representing the proportion of respondents in each approval category. Darker boxes indicate that a larger percentage of respondents fall into that group. Among Republicans, the darkest box appears in the “Disapprove strongly” category, indicating that a significant share of Republican respondents strongly disapprove of how universities are run and simultaneously hold cold feelings toward professors (low median temperatures). In contrast, Democratic respondents show more consistently positive sentiment across all approval levels, with their darkest boxes appearing in “Neither” and “Approve somewhat” categories, which also correspond to higher thermometer scores.
+
+This visual pattern reveals that Republican attitudes toward professors are tightly linked to institutional approval, while Democratic attitudes remain more favorable and stable, regardless of their level of trust in university governance.
+
+\vspace{2em}
+
+``` {r plot 4, echo=FALSE, fig.height=3.5, fig.width=8}
+
+data %>%
+  filter(!is.na(higher_ed_approve)) %>%
+  group_by(higher_ed_approve, Party) %>% 
+  mutate(approve_part_pcnt= round(100*n()/nrow(data))) %>%  
+  ggplot(aes(x=factor(higher_ed_approve, level =
+                        c("Disapprove strongly", "Disapprove somewhat",  "Neither", 
+                          "Approve somewhat", "Approve strongly"))
+             , y=therm_colprofs, fill = approve_part_pcnt)) +
+  facet_wrap(vars(Party)) +
+  geom_boxplot() +
+  scale_x_discrete(labels = label_wrap(10)) +
+  scale_fill_gradient(low='white', high = '#154360') +
+  labs(title="Sentiments Towards University and College Professors\nBased On Approval of How University and Colleges Are Run", 
+       x="Approval of Higher Education",
+       y="Temperature",
+       fill="%") +
+  theme_bw() 
+  
+```
+
+
+
+### Sentiments Toward Professors by Education Backgrounds
+
+The boxplot, titled "Sentiments Towards University and College Professors From Different Education Backgrounds", examines how educational attainment shapes perceptions of professors, broken down by political party. Again, the thermometer score reflects warmth toward professors, and the color gradient indicates the relative size of each educational group within the party.
+
+For Democrats, thermometer scores are relatively uniform across all education levels, with consistently warm attitudes. The darkest boxes appear in the “4-year degree” category, indicating that many Democratic respondents with higher education levels feel very positively toward professors. In contrast, Republican respondents display lower thermometer scores across all education levels. The darkest box appears in the high school graduate group, suggesting it is the largest subgroup among Republican respondents, and it corresponds to one of the lower warmth scores. 
+
+The gradient shading adds an important layer of interpretation by indicating which groups are most represented. For example, the findings suggest that positive sentiment among highly educated Democrats is not only favorable but also prevalent, whereas Republican skepticism is both more varied and concentrated in their largest education subgroup.
+
+\vspace{2em}
+
+``` {r plot 5, echo=FALSE, fig.height=3.5, fig.width=8}
+data %>%
+  filter(!is.na(educ)) %>%
+  group_by(educ, Party) %>% 
+  mutate(edu_part_pcnt= round(100*n()/nrow(data))) %>%  
+  ggplot(aes(x=factor(educ, level =
+                        c("No HS credential", "HS graduate", "Some college",
+                              "2-year degree",  "4-year degree",  "Post-grad"))
+             , y=therm_colprofs, fill = edu_part_pcnt)) +
+  facet_wrap(vars(Party)) +
+  geom_boxplot() +
+  scale_x_discrete(labels = label_wrap(10)) +
+  scale_fill_gradient(low='white', high = '#154360') +
+  labs(title="Sentiments Towards University and College Professors\nFrom Different Education Backgrounds", 
+       x="Level of Education",
+       y="Temperature",
+       fill="%") +
+  theme_bw()
+  
+```
+
+
+
+## Citation
+
+American National Election Studies. 2024. ANES 2024 Pilot Study.March 19, 2024 version. 
+https://electionstudies.org/data-center/2024-pilot-study/.
+
