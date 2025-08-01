@@ -36,7 +36,7 @@ A feelings thermometer is a scale from 0 to 100 that measures how warmly or cold
 
 ## Sentiments Toward Professors Based on Approval of Higher Education
 
-![Boxplot by Approval](figures/plot4_box_by_approval.png)
+![Boxplot by Approval](figures/plot4_thermometer_by_approval.png)
 
 Boxplots compare how Democratic and Republican voters feel about professors based on their approval of how universities are run. Republican views are tightly linked to institutional approval, with colder sentiments concentrated in the "Disapprove strongly" group. Democrats show consistently warm feelings across all approval levels.
 
@@ -44,7 +44,7 @@ Boxplots compare how Democratic and Republican voters feel about professors base
 
 ## Sentiments Toward Professors by Education Backgrounds
 
-![Boxplot by Education Level](figures/plot5_box_by_education.png)
+![Boxplot by Education Level](figures/plot5_thermometer_by_education.png)
 
 This boxplot compares thermometer scores across education levels. Democrats display relatively uniform and warm attitudes regardless of their education background, especially among college graduates. Republicans remain cooler across all levels, with the HS graduate group being the largest and coldest.
 
