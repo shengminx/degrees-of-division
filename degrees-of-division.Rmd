@@ -164,7 +164,7 @@ data %>%
 ### Sentiments Toward Professors by Education Backgrounds
 
 The boxplot, titled "Sentiments Towards University and College Professors From Different Education Backgrounds", examines how educational attainment shapes perceptions of professors, broken down by political party. Again, the thermometer score reflects warmth toward professors, and the color gradient indicates the relative size of each educational group within the party.
-
+ 
 For Democrats, thermometer scores are relatively uniform across all education levels, with consistently warm attitudes. The darkest boxes appear in the “4-year degree” category, indicating that many Democratic respondents with higher education levels feel very positively toward professors. In contrast, Republican respondents display lower thermometer scores across all education levels. The darkest box appears in the high school graduate group, suggesting it is the largest subgroup among Republican respondents, and it corresponds to one of the lower warmth scores. 
 
 The gradient shading adds an important layer of interpretation by indicating which groups are most represented. For example, the findings suggest that positive sentiment among highly educated Democrats is not only favorable but also prevalent, whereas Republican skepticism is both more varied and concentrated in their largest education subgroup.
